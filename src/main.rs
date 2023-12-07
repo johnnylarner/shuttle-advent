@@ -5,6 +5,7 @@ use axum::{
     Router,
 };
 
+
 #[derive(serde::Deserialize)]
 struct Reindeer {
     name: String,
@@ -79,6 +80,51 @@ impl ReindeerComparisonResponseBuilder {
             consumer: self.consumer,
         }
     }
+}
+
+#[derive(serde::Serialize)]
+struct ElfCount {
+    elf: u32,
+    #[serde(rename = "elf on a shelf")]
+    elf_on_a_shelf: u32,
+    #[serde(rename = "shelf with no elf on it")]
+    shelf: u32
+
+}
+
+impl ElfCount {
+    fn from_elf_string(elf_string: &str) -> Self {
+        let elf_identifier = "elf";
+        let num_elves = elf_string.matches(elf_identifier).count();
+
+        let elf_on_shelf_identifier = "elf on a shelf";
+        let num_elves_on_shelves = elf_string.matches(elf_on_shelf_identifier).count();
+        
+        let shelf_without_elf_regex = "shelf";
+        let num_shelves_without_elves = elf_string
+            .match_indices(shelf_without_elf_regex)
+            .filter(|m| {
+                let (i, _) = m;
+                let elf_on_substring = "elf on a ";
+                let not_proceeded_by_elf =  *i <= elf_on_substring.len()
+                    || &elf_string[i-elf_on_substring.len()..*i] != elf_on_substring;
+                
+                not_proceeded_by_elf
+            })
+            .count();
+
+        ElfCount{
+            elf: num_elves as u32,
+            elf_on_a_shelf: num_elves_on_shelves as u32,
+            shelf: num_shelves_without_elves as u32
+
+        }
+
+    }
+}
+
+async fn count_elves(elf_string: String) -> Json<ElfCount> {
+    Json(ElfCount::from_elf_string(&elf_string))
 }
 
 async fn calc_reindeer_strength(Json(reindeers): Json<Vec<Reindeer>>) -> impl IntoResponse {
@@ -158,7 +204,8 @@ async fn main() -> shuttle_axum::ShuttleAxum {
         .route("/get", get(hello_world))
         .route("/1/*path", get(exclusive_cube))
         .route("/4/strength", post(calc_reindeer_strength))
-        .route("/4/contest", post(compare_reindeers));
+        .route("/4/contest", post(compare_reindeers))
+        .route("/6", post(count_elves));
 
     Ok(router.into())
 }
