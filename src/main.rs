@@ -187,8 +187,11 @@ async fn exclusive_cube(Path(path): Path<String>) -> impl IntoResponse {
         panic!("maximum of 20 sledges can be processed simultaneously")
     }
 
-    let exclusive_or = all_nums.into_iter().reduce(|a, b| a ^ b).unwrap();
-    exclusive_or.pow(3).to_string()
+    if let Some(exclusive_or) = all_nums.into_iter().reduce(|a, b| a ^ b) {
+        exclusive_or.pow(3).to_string()
+    } else {
+        panic!("no numbers provided")
+    }
 }
 async fn hello_world() -> &'static str {
     "Hello, world!"
