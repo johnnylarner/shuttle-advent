@@ -9,7 +9,7 @@ use axum::{
 struct Reindeer {
     name: String,
     strength: u32,
-    speed: f32,
+    speed: f64,
     height: u32,
     antler_width: u32,
     snow_magic_power: u32,
@@ -148,10 +148,10 @@ async fn compare_reindeers(
     let fastest_speed = reindeers
         .iter()
         .map(|r| r.speed)
-        .fold(0.0 as f64, |a, b| a.max(b as f64));
+        .fold(0.0 as f64, |a, b| a.max(b));
     let fastest = reindeers
         .iter()
-        .filter(|r| r.speed == fastest_speed as f32)
+        .filter(|r| r.speed == fastest_speed)
         .next()
         .unwrap();
     let tallest = reindeers
