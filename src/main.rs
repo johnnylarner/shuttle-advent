@@ -5,7 +5,6 @@ use axum::{
     Router,
 };
 
-
 #[derive(serde::Deserialize)]
 struct Reindeer {
     name: String,
@@ -88,8 +87,7 @@ struct ElfCount {
     #[serde(rename = "elf on a shelf")]
     elf_on_a_shelf: u32,
     #[serde(rename = "shelf with no elf on it")]
-    shelf: u32
-
+    shelf: u32,
 }
 
 impl ElfCount {
@@ -99,27 +97,25 @@ impl ElfCount {
 
         let elf_on_shelf_identifier = "elf on a shelf";
         let num_elves_on_shelves = elf_string.matches(elf_on_shelf_identifier).count();
-        
+
         let shelf_without_elf_regex = "shelf";
         let num_shelves_without_elves = elf_string
             .match_indices(shelf_without_elf_regex)
             .filter(|m| {
                 let (i, _) = m;
                 let elf_on_substring = "elf on a ";
-                let not_proceeded_by_elf =  *i <= elf_on_substring.len()
-                    || &elf_string[i-elf_on_substring.len()..*i] != elf_on_substring;
-                
+                let not_proceeded_by_elf = *i <= elf_on_substring.len()
+                    || &elf_string[i - elf_on_substring.len()..*i] != elf_on_substring;
+
                 not_proceeded_by_elf
             })
             .count();
 
-        ElfCount{
+        ElfCount {
             elf: num_elves as u32,
             elf_on_a_shelf: num_elves_on_shelves as u32,
-            shelf: num_shelves_without_elves as u32
-
+            shelf: num_shelves_without_elves as u32,
         }
-
     }
 }
 
